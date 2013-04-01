@@ -1,0 +1,23 @@
+## Bukkit plugin description.
+---
+name: ForgePlugin
+version: 1.0.0
+description: Utilities designed for a Bukkit/Forge combination Minecraft server.
+authors:
+  - Zenexer
+website: https://github.com/Zenexer/ForgePlugin
+main: com.earth2me.minecraft.forgeplugin.ForgePlugin
+softdepend:
+  - Vault
+commands:
+  forgeplugin:
+    aliases:
+      - forge
+      - fp
+    usage: /<command> reload|version
+    description: Reloads the configuration of ForgePlugin, or describes the current installation.
+  chunkcleanup:
+    aliases:
+      - cc
+    usage: /<command>
+    description: Forcefully unloads extraneous chunks.
