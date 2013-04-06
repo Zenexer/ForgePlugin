@@ -1,13 +1,21 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.earth2me.minecraft</groupId>
+	<groupId>com.earth2me.minecraft.forgeplugin</groupId>
 	<artifactId>ForgePlugin</artifactId>
 	<version>1.0.0</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
 	<name>ForgePlugin</name>
 	<url>https://github.com/Zenexer/ForgePlugin</url>
+
+	<modules>
+		<module>ForgePluginBukkit</module>
+		<module>ForgePluginRailcraft</module>
+		<module>ForgePluginEquivalentExchange</module>
+		<module>ForgePluginRedpower</module>
+		<module>ForgePluginTubeStuff</module>
+	</modules>
 
 	<developers>
 		<developer>
@@ -35,6 +43,14 @@
 
 	<repositories>
 		<repository>
+			<!--
+			mvn deploy:deploy-file -Durl=file://$PWD/lib -DcreateChecksum=true -DgeneratePom=true -Dpackaging= -DgroupId= -DartifactId= -Dversion= -Dfile=
+			mvn deploy:deploy-file -Durl=file://%CD%/lib -DcreateChecksum=true -DgeneratePom=true -Dpackaging= -DgroupId= -DartifactId= -Dversion= -Dfile=
+			-->
+			<id>local-repo</id>
+			<url>file://${project.basedir}/../lib</url>
+		</repository>
+		<repository>
 			<id>bukkit-repo</id>
 			<url>http://repo.bukkit.org/content/groups/public/</url>
 		</repository>
@@ -48,69 +64,8 @@
 		</repository>
 	</repositories>
 
-	<build>
-		<finalName>${project.name}</finalName>
-		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-		<testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
-		<resources>
-			<resource>
-				<directory>${project.basedir}/src/main/resources</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>.*</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<compilerArguments>
-						<Xlint />
-					</compilerArguments>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<outputDirectory>${dir.artifacts}/unshaded</outputDirectory>
-				</configuration>
-			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-							<outputDirectory>${dir.artifacts}</outputDirectory>
-							<outputFile>${dir.artifacts}/${project.artifactId}.jar</outputFile>
-                            <minimizeJar>true</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.mcstats.bukkit:metrics</include>
-                                </includes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-		</plugins>
-	</build>
-
 	<properties>
-		<dir.artifacts>artifacts</dir.artifacts>
+		<dir.artifacts>${project.basedir}/../artifacts</dir.artifacts>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -144,25 +99,63 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>net.milkbowl</groupId>
 			<artifactId>Vault</artifactId>
 			<version>1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.2.5-R4.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>0.11.6</version>
+		</dependency>
+		<!-- Replaced by technic-pack:tekkit -->
+		<!--dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>1.2.5-R4.0</version>
+		</dependency-->
+		<dependency>
+			<groupId>technic-pack</groupId>
+			<artifactId>tekkit</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+		<!-- Mods -->
+		<dependency>
+			<groupId>Tekkit</groupId>
+			<artifactId>Railcraft</artifactId>
+			<version>5.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>Tekkit</groupId>
+			<artifactId>EE2Server</artifactId>
+			<version>1.4.6.5</version>
+		</dependency>
+		<dependency>
+			<groupId>Tekkit</groupId>
+			<artifactId>buildcraft</artifactId>
+			<version>2.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>Tekkit</groupId>
+			<artifactId>Redpower</artifactId>
+			<version>2.0p5b2</version>
+		</dependency>
+		<dependency>
+			<groupId>Tekkit</groupId>
+			<artifactId>tubestuff</artifactId>
+			<version>49.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>Tekkit</groupId>
+			<artifactId>immibis-core</artifactId>
+			<version>49.1.1</version>
+		</dependency>
+		<!-- Scope: test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

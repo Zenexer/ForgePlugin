@@ -1,0 +1,112 @@
+# Configuration for ForgePlugin.
+---
+
+# General settings.
+# Note: At optimal performance levels, there are 20 ticks per second.
+settings:
+  # After a chunk is loaded, it will be re-checked to ensure that it should be remain loaded.  Specify the number of
+  # minutes (ticks-per-second-dependent) before that check occurs.  Negative to disable (default).
+  recheck-delay: 3
+
+  # If there are more than this many entities in a chunk when it is unloaded, it won't be checked for remaining players.
+  entity-check-limit: -1
+
+  # Maximum number of chunks that a persistent chunk range can contain.
+  max-chunks-per-range: 100
+
+  # Time in ticks between inventory scans.  After this number of ticks, the plugin will scan all players' hands for
+  # banned items.
+  inventory-scan-interval: 20
+
+# Cleans up after bugs that rapidly spawn items.
+entity-overflow:
+  # Time in ticks between entity scans.  After this number of ticks, the plugin will scan all chunks for entity
+  # overflows.
+  scan-interval: 200
+  
+  # Exceeding this number of entities in one chunk will result in it being cleared of most types of entities.
+  max-entities: 300
+  
+  # This delay must occur between item drops in the same chunk, or they won't be counted.
+  min-item-interval: -1;
+
+# These chunks will always stay loaded.  Coordinates are in [world, X, Z] format, and are chunk coordinates: that means
+# that you need to take block coordinates and divide by 16 (or, more formally, bitwise right shift by 4).  Ranges can be
+# specified in the form [world, [X1, Z1], [X2, Z2]].
+persistent-chunks:
+  # Zenexer's flowers and factory at the old spawn; /home Zenexer:flowers, /home Zenexer:factory, /warp oldspawn
+  - [world, [-24, -99], [-22, -98]]
+  # Zenexer's flowers and factory at his house: /home Zenexer:home, /home Zenexer:roof
+  - [world, [-3, -124], [0, -127]]
+
+# Items take the format "ID:data".  They will be removed if the player interacts.  Use ID:0  if you only want to ban
+# the item with data value 0.  IDs lacking data values or with a data value of -1 will ban all data values for that ID.
+# You can put the name of the item after the ID:data entry for documentation, and it will be ignored.  Items that are
+# often seen with varying data values should have a data value of * (asterisk) for documentation purposes.
+#
+# Note that data values over 127 work with items, but not blocks.
+banned-items:
+  # These items/blocks are auto-removed.  Items listed here are automatically added to the other lists.
+  all:
+    - 239 Industrial TNT (ITNT) - Explosive
+    - 7270 TNT Cart - Explosive
+    - 126:10 Nova Catalyst - Explosive
+    - 126:11 Nova Cataclysm - Explosive
+    - 30208:* Mining Laser - Mass destruction
+    - 26522 Dynamite - Explosive
+    - 30215 Dynamite - Explosive
+    - 30213 Dynomite-O-Mote - Useless given ban on dynamite
+    - 30214 Sticky Dynamite - Explosive
+    - 27582 Hurricane Boots - Invincibility and miscellaneous trouble
+    - 27581 Gravity Greaves - Invincibility and miscellaneous trouble
+    - 27579 Infernal Armour - Invincibility and miscellaneous trouble
+    - 27580 Abyss Helmet - Invincibility and miscellaneous trouble
+    - 27527:* Destruction Catalyst - Mass destruction
+    - 27556:* Catalytic Lens - Mass destruction
+    - 27535:* Hyperkinetic Lens - Mass destruction
+    - 214:0 World Anchor - This allows a player to keep unlimited chunks loaded.  Use Dimensional Anchors instead.
+    - 27573:* Red Morning Star - Mass destruction
+    - 27570:* Red Matter Hammer - Mass destruction
+    - 27555:* Dark Matter Hammer - Massive destruction
+    - 27583:* Mercurial Eye - Mass alteration
+    - 237 Nuke - Explosive
+    - 27533 Ring of Ignition - Mass alteration
+    - 27574 Zero Ring - Mass alteration
+    - 27531 Volcanite Amulet - Mass alteration
+    - 27530 Evertide Amulet - Mass alteration
+    - 27584 Ring of Arcana - Mass alteration
+    - 27593 Void Ring - Mass destruction
+    - 27537 Harvest Goddes Band - Mass alteration
+    - 166:* BuildCraft Pipes (block) - Lag
+    - 4300 Advanced Insertion Pipe (item) - Lag
+    - 4301 Advanced Wooden Transport Pipe (item) - Lag
+    - 4302 Distribution Transport Pipe (item) - Lag
+    - 4303 Item Teleport Pipe (item) - Lag
+    - 4304 Waterproof Teleport Pipe (item) - Lag
+    - 4305 Power Teleport Pipe (item) - Lag
+    - 4307 Cobblestone Transport Pipe (item) - Lag
+    - 4308 Stone Transport Pipe (item) - Lag
+    - 4309 Iron Transport Pipe (item) - Lag
+    - 4310 Golden Transport Pipe (item) - Lag
+    - 4311 Diamond Transport Pipe (item) - Lag
+    - 4312 Obsidian Transport Pipe (item) - Lag
+    - 4313 Wooden Waterproof Pipe (item) - Lag
+    - 4314 Cobblestone Waterproof Pipe (item) - Lag
+    - 4315 Stone Waterproof Pipe (item) - Lag
+    - 4316 Iron Waterproof Pipe (item) - Lag
+    - 4317 Golden Waterproof Pipe (item) - Lag
+    - 4322 Stone Conductive Pipe (item) - Lag
+    - 4324 Golden Conductive Pipe (item) - Lag
+    - 27538 Watch Of Flowing Time (item) - Lag and nuisance to other players
+
+  # These items/blocks can't be used.  Right-click won't work.
+  use:
+    - 27526 Philosopher's Stone - Mass alteration
+
+  # These items/blocks can't be crafted, but they can still be used.  This might not work with some mods, so you should
+  # usually ban items altogether.  For example, Equivalent Exchange allows players to create items without crafting.
+  craft: []
+
+  # These blocks can't be placed, but they can be crafted.  Some items, like paintings, are placed as entities; this
+  # probably won't work for such items.
+  build: []
