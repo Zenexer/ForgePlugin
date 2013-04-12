@@ -23,10 +23,10 @@ entity-overflow:
   # Time in ticks between entity scans.  After this number of ticks, the plugin will scan all chunks for entity
   # overflows.
   scan-interval: 200
-  
+
   # Exceeding this number of entities in one chunk will result in it being cleared of most types of entities.
   max-entities: 300
-  
+
   # This delay must occur between item drops in the same chunk, or they won't be counted.
   min-item-interval: -1;
 
@@ -38,6 +38,8 @@ persistent-chunks:
   - [world, [-24, -99], [-22, -98]]
   # Zenexer's flowers and factory at his house: /home Zenexer:home, /home Zenexer:roof
   - [world, [-3, -124], [0, -127]]
+  # kbop451's flower towers: /home kbop451:diamond
+  - [world, [-71, 20], [-70, 21]]
 
 # Items take the format "ID:data".  They will be removed if the player interacts.  Use ID:0  if you only want to ban
 # the item with data value 0.  IDs lacking data values or with a data value of -1 will ban all data values for that ID.
@@ -48,6 +50,8 @@ persistent-chunks:
 banned-items:
   # These items/blocks are auto-removed.  Items listed here are automatically added to the other lists.
   all:
+    - 181:5 Crystal Chest - Kills TPS (server-side) under certain circumstances
+    - 19762 Crystal Chest Upgrade - Useless without crystal chests
     - 239 Industrial TNT (ITNT) - Explosive
     - 7270 TNT Cart - Explosive
     - 126:10 Nova Catalyst - Explosive
@@ -76,7 +80,7 @@ banned-items:
     - 27530 Evertide Amulet - Mass alteration
     - 27584 Ring of Arcana - Mass alteration
     - 27593 Void Ring - Mass destruction
-    - 27537 Harvest Goddes Band - Mass alteration
+    - 27537 Harvest Goddess Band - Mass alteration
     - 166:* BuildCraft Pipes (block) - Lag
     - 4300 Advanced Insertion Pipe (item) - Lag
     - 4301 Advanced Wooden Transport Pipe (item) - Lag

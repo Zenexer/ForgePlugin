@@ -1,5 +1,7 @@
-package ee;
+package ee.core;
 
+import ee.EEItem;
+import ee.ItemAlchemyBag;
 import ee.item.ItemLootBall;
 import forge.IPickupHandler;
 import net.minecraft.server.EntityHuman;
@@ -7,7 +9,7 @@ import net.minecraft.server.EntityItem;
 import net.minecraft.server.ItemStack;
 
 
-public class AlchemyBagPickupHandler implements IPickupHandler
+public final class AlchemyBagPickupHandler implements IPickupHandler
 {
 	@Override
 	public boolean onItemPickup(final EntityHuman player, final EntityItem item)

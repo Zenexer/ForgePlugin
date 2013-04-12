@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import ee.*;
+import ee.core.AlchemyBagPickupHandler;
+import ee.core.ConnectionHandler;
 import ee.core.PickupHandler;
 import ee.network.PacketHandler;
 import forge.DimensionManager;
@@ -43,10 +45,10 @@ public class mod_EE extends NetworkMod
 		MinecraftForge.registerEntity(EntityLootBall.class, this, 149, 300, 2, true);
 		MinecraftForge.registerEntity(EntityNovaPrimed.class, this, 150, 300, 2, true);
 		MinecraftForge.registerEntity(EntityHyperkinesis.class, this, 151, 300, 2, true);
-		
+
 		EEItem.init();
 		EEBlock.init();
-		
+
 		EEMaps.InitAlchemicalValues();
 		EEMaps.InitFlyingItems();
 		EEMaps.InitFuelItems();
@@ -62,14 +64,15 @@ public class mod_EE extends NetworkMod
 		EEMaps.InitOreBlocks();
 		EEMaps.InitBlacklist();
 		EEMaps.InitMetaData();
-		
+
 		pedestalModelID = ModLoader.getUniqueBlockModelID(this, true);
 		chestModelID = ModLoader.getUniqueBlockModelID(this, true);
-		
+
 		blackListTimer = 100;
-			
+
 		MinecraftForge.registerPickupHandler(new PickupHandler());
 		MinecraftForge.registerPickupHandler(new AlchemyBagPickupHandler());
+		MinecraftForge.registerConnectionHandler(new ConnectionHandler());
 	}
 
 	@Override
@@ -87,37 +90,43 @@ public class mod_EE extends NetworkMod
 
 		for (int var4 = 0; var4 < var3; var4++)
 		{
-			World var5 = var2[var4];
-			onTickInGame(var1, var5.players, var5);
+			final World var5 = var2[var4];
+
+			@SuppressWarnings("unchecked")
+			final List<EntityHuman> players = var5.players;
+
+			onTickInGame(var1, players, var5);
 		}
 
 		return true;
 	}
 
-	public boolean onTickInGame(MinecraftServer var1, List<EntityHuman> var2, World var3)
+	public boolean onTickInGame(MinecraftServer var1, List<EntityHuman> players, World var3)
 	{
 		if (!EEBase.externalModsInitialized)
 		{
-			for (int var4 = 0; var4 < ModLoader.getLoadedMods().size(); var4++)
+			for (final BaseMod mod : ModLoader.getLoadedMods())
 			{
-				if (((BaseMod)ModLoader.getLoadedMods().get(var4)).toString().contains("mod_IC2"))
+				final String name = mod.toString();
+
+				if (name.contains("mod_IC2"))
 				{
 					EEAddonIC2.initialize();
 				}
-				else if (((BaseMod)ModLoader.getLoadedMods().get(var4)).toString().contains("mod_RedPowerCore"))
+				else if (name.contains("mod_RedPowerCore"))
 				{
 					EEAddonRP2.initBase();
 				}
-				else if (((BaseMod)ModLoader.getLoadedMods().get(var4)).toString().contains("mod_RedPowerWorld"))
+				else if (name.contains("mod_RedPowerWorld"))
 				{
 					EEAddonRP2.initBase();
 					EEAddonRP2.initWorld();
 				}
-				else if (((BaseMod)ModLoader.getLoadedMods().get(var4)).toString().contains("mod_BuildCraftEnergy"))
+				else if (name.contains("mod_BuildCraftEnergy"))
 				{
 					EEAddonBC.initialize();
 				}
-				else if (((BaseMod)ModLoader.getLoadedMods().get(var4)).toString().contains("mod_Forestry"))
+				else if (name.contains("mod_Forestry"))
 				{
 					EEAddonForestry.initialize();
 				}
@@ -130,50 +139,29 @@ public class mod_EE extends NetworkMod
 
 		if (tickCounter % 10 == 0)
 		{
-			doTransGridUpdates(var2);
+			//doTransGridUpdates(var2);
+			//doWatchCheck(players, var3);
+
 			tickCounter = 0;
 		}
 
-		doWatchCheck(var2, var3);
-		doFlightCheck(var2, var3);
-		Iterator var6 = var2.iterator();
+		doFlightCheck(players, var3);
 
-		while (var6.hasNext())
+		for (final EntityHuman player : players)
 		{
-			EntityHuman var5 = (EntityHuman)var6.next();
-
-			if (blackListTimer <= 0)
-			{
-				blackListTimer = 100;
-
-				if (EEMaps.isBlacklisted(var5.name))
-				{
-					var5.world.strikeLightning(new EntityWeatherLighting(var5.world, var5.locX, var5.locY, var5.locZ));
-				}
-			}
-
-			doGemPowers(var5);
-			doEquipCheck(var5, var3);
-			doFireImmuneCheck(var5);
+			//doGemPowers(player);
+			doEquipCheck(player, var3);
+			doFireImmuneCheck(player);
 		}
 
-		if (blackListTimer > 0)
-		{
-			blackListTimer -= 1;
-		}
-
-		tickCounter += 1;
+		tickCounter++;
 		return true;
 	}
 
-	private void doTransGridUpdates(List var1)
+	private void doTransGridUpdates(List<EntityHuman> var1)
 	{
-		Iterator var2 = var1.iterator();
-
-		while (var2.hasNext())
+		for (final EntityHuman var3 : var1)
 		{
-			EntityHuman var3 = (EntityHuman)var2.next();
-
 			if (EEBase.getTransGridOpen(var3).booleanValue())
 			{
 				EEProxy.getTransData(var3).onUpdate(var3.world, var3);
@@ -293,15 +281,16 @@ public class mod_EE extends NetworkMod
 	private void doWatchCheck(List<EntityHuman> var1, World var2)
 	{
 		int var3 = 0;
-		
+
 		for (final EntityHuman var5 : var1)
 		{
 			for (final ItemStack var9 : EEBase.quickBar(var5))
 			{
-				if ((var9 != null) && ((var9.getItem() instanceof ItemEECharged)) && ((var9.getItem() instanceof ItemWatchOfTime)) && ((var9.getData() & 0x1) == 1) && (EEBase.getPlayerEffect(var9.getItem(), var5) > 0))
+				final Item item = var9.getItem();
+				if (var9 != null && item instanceof ItemWatchOfTime && (var9.getData() & 0x1) == 1 && EEBase.getPlayerEffect(item, var5) > 0)
 				{
 					var3 += ((ItemEECharged)var9.getItem()).chargeLevel(var9) + 1;
-					EEBase.playerWatchMagnitude.put(var5, Integer.valueOf(((ItemEECharged)var9.getItem()).chargeLevel(var9) + 1));
+					EEBase.playerWatchMagnitude.put(var5, ((ItemEECharged)var9.getItem()).chargeLevel(var9) + 1);
 				}
 			}
 		}
@@ -369,8 +358,7 @@ public class mod_EE extends NetworkMod
 				{
 					forceEnableSWRG(var4);
 				}
-
-				if (!var4.abilities.isFlying)
+				else
 				{
 					disableSWRG(var4);
 				}
@@ -453,15 +441,23 @@ public class mod_EE extends NetworkMod
 		for (int var5 = 0; var5 < var4; var5++)
 		{
 			ItemStack var6 = var3[var5];
-
-			if ((var6 != null) && ((var6.getItem() instanceof ItemEECharged)))
+			if (var6 == null)
 			{
+				continue;
+			}
+
+			final Item item = var6.getItem();
+
+			if (item != null && item instanceof ItemEECharged)
+			{
+				final ItemEECharged chargedItem = (ItemEECharged)item;
+
 				if (var6 == var1.U())
 				{
-					((ItemEECharged)var6.getItem()).doHeld(var6, var2, var1);
+					chargedItem.doHeld(var6, var2, var1);
 				}
 
-				((ItemEECharged)var6.getItem()).doPassive(var6, var2, var1);
+				chargedItem.doPassive(var6, var2, var1);
 
 				if (((var6.getData() & 0x1) == 1) && (EEMaps.hasDurationEffect(var6.getItem())))
 				{
@@ -469,7 +465,7 @@ public class mod_EE extends NetworkMod
 					{
 						if (EEBase.getPlayerEffect(var6.getItem(), var1) > 0)
 						{
-							EEBase.updatePlayerEffect(var6.getItem(), EEBase.getPlayerEffect(var6.getItem(), var1) - (((ItemEECharged)var6.getItem()).chargeLevel(var6) + 1) * (((ItemEECharged)var6.getItem()).chargeLevel(var6) + 1), var1);
+							EEBase.updatePlayerEffect(var6.getItem(), EEBase.getPlayerEffect(var6.getItem(), var1) - (chargedItem.chargeLevel(var6) + 1) * (chargedItem.chargeLevel(var6) + 1), var1);
 						}
 					}
 					else if (EEBase.getPlayerEffect(var6.getItem(), var1) > 0)
@@ -479,16 +475,16 @@ public class mod_EE extends NetworkMod
 
 					if (EEBase.getPlayerEffect(var6.getItem(), var1) <= 0)
 					{
-						((ItemEECharged)var6.getItem()).ConsumeReagent(var6, var1, false);
+						chargedItem.ConsumeReagent(var6, var1, false);
 					}
 
 					if (EEBase.getPlayerEffect(var6.getItem(), var1) <= 0)
 					{
-						((ItemEECharged)var6.getItem()).doToggle(var6, var2, var1);
+						chargedItem.doToggle(var6, var2, var1);
 					}
 					else
 					{
-						((ItemEECharged)var6.getItem()).doActive(var6, var2, var1);
+						chargedItem.doActive(var6, var2, var1);
 					}
 				}
 
@@ -501,16 +497,16 @@ public class mod_EE extends NetworkMod
 
 					if (EEBase.getPlayerEffect(var6.getItem(), var1) <= 0)
 					{
-						((ItemEECharged)var6.getItem()).ConsumeReagent(var6, var1, false);
+						chargedItem.ConsumeReagent(var6, var1, false);
 					}
 
 					if (EEBase.getPlayerEffect(var6.getItem(), var1) <= 0)
 					{
-						((ItemEECharged)var6.getItem()).doToggle(var6, var2, var1);
+						chargedItem.doToggle(var6, var2, var1);
 					}
 					else
 					{
-						((ItemEECharged)var6.getItem()).doActive(var6, var2, var1);
+						chargedItem.doActive(var6, var2, var1);
 					}
 				}
 			}

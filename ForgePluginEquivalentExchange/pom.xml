@@ -65,7 +65,28 @@
 									<excludes>
 										<exclude>ee/AlchemyBagData.class</exclude>
 										<exclude>ee/ContainerRMFurnace.class</exclude>
+										<exclude>ee/ContainerTransmutation.class</exclude>
+										<exclude>ee/ItemDarkAxe.class</exclude>
+										<exclude>ee/ItemDarkHammer.class</exclude>
+										<exclude>ee/ItemDarkHoe.class</exclude>
+										<exclude>ee/ItemDarkPickaxe.class</exclude>
+										<exclude>ee/ItemDarkShears.class</exclude>
+										<exclude>ee/ItemDarkSpade.class</exclude>
+										<exclude>ee/ItemDarkTool.class</exclude>
+										<exclude>ee/ItemPhilosopherStone.class</exclude>
+										<exclude>ee/ItemRedAxe.class</exclude>
+										<exclude>ee/ItemRedHammer.class</exclude>
+										<exclude>ee/ItemRedHoe.class</exclude>
+										<exclude>ee/ItemRedKatar.class</exclude>
+										<exclude>ee/ItemRedMace.class</exclude>
+										<exclude>ee/ItemRedPickaxe.class</exclude>
+										<exclude>ee/ItemRedShears.class</exclude>
+										<exclude>ee/ItemRedSpade.class</exclude>
+										<exclude>ee/ItemRedTool.class</exclude>
+										<exclude>ee/MercurialEyeData.class</exclude>
 										<exclude>ee/TileRMFurnace.class</exclude>
+										<exclude>ee/TransTabletData.class</exclude>
+										<exclude>net/minecraft/server/EEProxy.class</exclude>
 										<exclude>net/minecraft/server/mod_EE.class</exclude>
 									</excludes>
 								</filter>
