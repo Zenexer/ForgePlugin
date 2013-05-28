@@ -210,7 +210,8 @@ Take these with a grain of salt.  They are not factual.
 License
 =======
 
-Copyright (c) 2012, Paul Buonopane.  All rights reserved.  "Earth2Me", "Zenexer", and "ForgePlugin" are trademarks of Paul Buonopane.
+Copyright (c) 2012, Paul Buonopane. All rights reserved.
+"Earth2Me", "Zenexer", and "ForgePlugin" are trademarks of Paul Buonopane.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
