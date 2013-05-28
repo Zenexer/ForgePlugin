@@ -210,22 +210,31 @@ Take these with a grain of salt.  They are not factual.
 License
 =======
 
-Copyright (c) 2012 Paul Buonopane.  All rights reserved.  "Earth2Me" and "Zenexer" are trademarks of Paul Buonopane.
+Copyright (c) 2012, Paul Buonopane.  All rights reserved.  "Earth2Me", "Zenexer", and "ForgePlugin" are trademarks of Paul Buonopane.
 
-This product and its source code are made available for both commercial and non-commercial use.  You may use the product and its source code under the following conditions:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-* This license remains in place.
-* Any README, README.md, and similar documents are included with any portion of the source code.
-* Any README, README.md, and similar documents are included with any portion of the compiled product.
-* Any modifications become the property of the above stated copyright holder.  You hold no rights to modifications.
-* You will immediately destroy all copyright-protected works upon request of the above stated copyright holder.
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
 
-PROVIDED THE AFFOREMENTIONED CONDITIONS ARE MET, you are entitled to the following, unless otherwise revoked by the above stated copyright holder:
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-* You may use the above stated trademark(s) to endorse your commercial and/or non-commercial products.
-* You may modify the copyright-protected work(s).
-* You may redistribute the copyright-protected work(s), in part or in whole.
-
-Small portions of code are decompiled from other sources.  They belong to their respective owners.  The binaries of each mod (.jar and/or .zip files) are additionally licensed as either the property of Mojang, or as defined by the mods' respective authors, as appropriate.
-
-Please be respectful of the wishes of the original mod authors, regardless of legal obligations.  They put a lot of effort into the mods that make up Tekkit.
+Portions of code are derived from other sources.  Though heavily modified, and
+in many cases, entirely rewritten, the original forms belong to their
+respective owners.  Often, the licensing for this original code remains
+unclear. Please be respectful of the wishes of the original mod authors,
+regardless of legal obligations. They put a lot of effort into the mods that
+form Tekkit.
