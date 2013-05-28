@@ -1,3 +1,15 @@
+Introduction
+============
+
+ForgePlugin offers enhancements and fixes for a variety of Tekkit Classic components.  It is comprised of one plugin and several mod patches:
+
+* **ForgePluginBukkit** is the core plugin, and runs via Bukkit.  It provides a chunk management system, item/block banning, and entity overflow protection.  This generally allows servers to stay running for a lot longer without crashing.
+* **ForgePluginEquivalentExchange** is a patch for EquivalentExchange.  It fixes some serious memory leaks and prevents most tools from working in regions protected by the likes of WorldGuard, LWC, etc.  It also fixes the infamous RM Furnace dupe glitch, and provides a rewrite for Alchemy Tablets.
+* **ForgePluginRailcraft** is a patch for Railcraft that fixes a serious bug with tank carts that allows players to both dupe items and crash servers.
+* **ForgePluginRedpower** is a patch for Redpower that provides dramatic performance enhancements for Pneumatic Tubes and similar mechanisms.  Players will no longer lag, crash, or disconnect near large factories, server performance will increase, and network usage will drop.
+* **ForgePluginTubeStuff** is a patch for TubeStuff to fix a dupe glitch with Automatic Crafting Tables, MkII by correcting their behavior when they break.
+
+
 Installation
 ============
 
@@ -19,6 +31,7 @@ Bukkit Plugin Features
 * Prevent items from dropping too quickly (disabled by default): used to counter tank cart-like glitches that spew items.  All known glitches are fixed as of writing, so unnecessary, and often has false-positives.  Can be used to prevent drop parties.
 * Chunk manager: replaces the server's chunk loading/unloading mechanism, since the default doesn't work very well; helps keep memory usage low, and fixes server-side chunk loading glitches.  Unfortunately, it can't fix the client-side bugs.
 * Support for permissions via Vault--not required, but highly recommended
+
 
 Entity Overflow
 ---------------
@@ -129,82 +142,6 @@ BuildCraft
 To Do:
 
 * Reprogram pipes.  Until then, use Redpower's pneumatic tubes and derivatives.
-
-
-Tips to Future Modders
-======================
-
-Don't repeat the mistakes of the past.  Before you start publishing mods, research these topics:
-
-
-Important Programming Concepts/Tools
-------------------------------------
-
-* Polymorphism in Java
-* Java best practices
-* Events in Java
-* Lombok
-* Maven
-* Multitasking
-	* Process calculi
-	* Asynchronous versus synchronous
-	* Multithreading
-* Version Control Systems (VCS)
-	* git
-	* subversion (SVN)
-	* GitHub (public: free and most popular/most features, private: paid)
-	* BitBucket (public: free, private: paid)
-* Javadoc
-
-
-Additional Software Project Tools
----------------------------------
-
-* Continuous Integration (CI)
-	* TeamCity
-	* Jenkins
-* Bug tracking
-	* Assembla
-* Documentation
-	* Wikia
-	* GitHub
-* Licensing
-	* Creative Commons: Make yourself a fitting license based on your preferences
-	* BSD: Restrictive, most rights reserved
-	* GPL: Restrictive, very copyleft and anti-abuse
-	* LGPL: Similar to GPL, but less restrictive; possibly more appropriate for mods
-	* Plenty more: look up "open source licenses"
-
-
-Additional Programming Tips
----------------------------
-
-* If you're copying and pasting code, you're doing it wrong.  Zero exceptions.  See: Polymorphism
-* Don't use multiple HashMap objects with the same key.  Use one HashMap, and create your own class to store all of the would-be values.
-* It's rare that you should be doing something every _n_ ticks.  If you're doing something _every_ tick, you're definitely on the wrong track: you're opening up your code to performance issues and major exploits.  Instead, do that something every time an event occurs, such as every time an inventory slot is changed.  Your code will be more responsive, more reliable, less exploitable, and more efficient.
-* Consider measuring time in milliseconds instead of ticks.  If you want to run a custom furnace for 20 seconds, check how many milliseconds have elapsed every 40 or so ticks.  If 20_000 or more have elapsed, the time has completed.  This way, your mod is only dependent on TPS for precision, not accuracy.  By the way, if you're using a new enough version of Java, you can type a number like 20_000--with the underscore.  It's a good practice, since it's more legible.  There is a consistency issue with this millisecond-versus-tick approach, but I suspect that Minecraft will convert to real time at some point anyway.
-* Don't keep calling an accessor method to obtain a value repeatedly.  Call it once, store the value in a final, method-scoped variable, and use the variable.  Example: `final Server server = plugin.getServer();`
-* Never pass `this` to a field or method in a constructor.  If you're not creating a memory leak, you're at least sending a method an uninitialized object.  Using it as a qualifier is fine.
-* If you are storing all instances of a particular type in a static array or Collection (List, Set, HashMap, etc.), be wary of memory leaks.  You **must** remove each instance from the static array/Collection when you are done with it; otherwise, the reference persists, and keeps instance (and anything _it_ references, and so on) stuck in memory.  If you are using, say, an EntityPlayer object as a key, this can be quite a significant leak.
-* Make use of multiple packages to organize your code.
-* Try to do things once and cache the results, rather than recalculating the same data over and over again.
-* Don't take shortcuts, particularly with inventories/containers.  There are a lot of opportunities for exploitable bugs here.
-* Try to add support for other mods.  Even if you don't personally like the other mods, many of your users likely will.
-* Make everything as configurable as possible--but only check the configuration values once, and cache them in a field until a reload/restart occurs.
-* Case-sensitivity in commands, which is Java's default behavior, tends to cause confusion for players.
-* If you're returning a Collection from a method, you should probably make it immutable using a method such as `<T> List<T> Collections.unmodifiableList(List<? extends T>)`.
-
-
-Controversial Tips in Ethics
-----------------------------
-
-Take these with a grain of salt.  They are not factual.
-
-* It might be easier to use NetBeans than Eclipse if you're working on a team.  It will enforce stricter coding requirements by default, and will take a raw Maven/Ant project without additional project files.  This saves each member from needing to initialize their own project, because project files from an Eclipse workspace shouldn't be checked into a repository.  On the downside, MCP is designed for Eclipse, so you'll need to know your way around Maven and/or Ant to automate everything.
-* Consider publishing your source code under an open source license on a site such as GitHub, so people like me can fix your code and send it back to you, instead of publishing a separate fix out of your control.  You are not the ultimate programmer, and if you don't publish your source code openly, you are giving up the opportunity to have tens/hundreds of other programmers fix your mistakes, or even add new features.  Remember, you're editing someone else's software--and in shady legal territory, despite permission--so don't get all high and mighty about us modifying yours.  Besides, you still retain any rights to the software, though I'm still unclear just what rights modders and plugin developers like me have.  I'm not a lawyer.
-* Don't follow the coding practices of an existing mod(der), because all that I've seen are deplorable.  Some plugins are fine, but it varies widely.
-* Most mods that I've seen have one big bright side: their usability.  No matter how awesome your mod is, if it's not easy and intuitive to use, nobody is going to bother.
-* Just because you call it a "beta" or "alpha" does not mean that people won't mind when you crash their servers.
 
 
 License
