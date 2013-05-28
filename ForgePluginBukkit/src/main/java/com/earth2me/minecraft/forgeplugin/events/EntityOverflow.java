@@ -269,8 +269,8 @@ public final class EntityOverflow implements IEventHandler, Runnable
 
 		if (localMaxEntities > 0 && chunk.getEntities().length >= localMaxEntities)
 		{
-			//e.setCancelled(true);
-			//item.remove();
+			e.setCancelled(true);
+			item.remove();
 			return;
 		}
 
