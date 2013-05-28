@@ -1,7 +1,6 @@
 package ee;
 
 import net.minecraft.server.*;
-import org.bukkit.Bukkit;
 
 
 public abstract class ItemRedTool extends ItemEESuperTool
@@ -20,8 +19,6 @@ public abstract class ItemRedTool extends ItemEESuperTool
 	@Override
 	public float getDestroySpeed(ItemStack var1, Block var2)
 	{
-		System.out.println("getDestroySpeed");
-		Bukkit.broadcastMessage("getDestroySpeed");
 		for (int var3 = 0; var3 < blocksEffectiveAgainst.length; var3++)
 		{
 			if (blocksEffectiveAgainst[var3] == var2)

@@ -17,42 +17,42 @@ public final class ChunkLocation
 	private final int x;
 	@Getter
 	private final int z;
-	
+
 	public ChunkLocation(final Chunk chunk)
 	{
 		world = chunk.getWorld();
 		x = chunk.getX();
 		z = chunk.getZ();
 	}
-	
+
 	public ChunkLocation(final World world, final int x, final int z)
 	{
 		this.world = world;
 		this.x = x;
 		this.z = z;
 	}
-	
+
 	public static ChunkLocation parse(final List<?> list)
 	{
 		if (list == null || list.size() != 3)
 		{
 			return null;
 		}
-		
+
 		Object[] elements = list.toArray();
-		
+
 		if (!(elements[0] instanceof String))
 		{
 			return null;
 		}
-		
+
 		final World world = Bukkit.getWorld((String)elements[0]);
 		if (world == null)
 		{
 			Bukkit.getLogger().log(Level.WARNING, String.format("Invalid world ID: %s", elements[0]));
 			return null;
 		}
-		
+
 		for (int i = 1; i < elements.length; i++)
 		{
 			if (elements[i] == null || !(elements[i] instanceof Integer))
@@ -60,19 +60,19 @@ public final class ChunkLocation
 				return null;
 			}
 		}
-		
-		return new ChunkLocation(world, (Integer)elements[0], (Integer)elements[1]);
+
+		return new ChunkLocation(world, (Integer)elements[1], (Integer)elements[2]);
 	}
-	
+
 	public static ChunkLocation parse(final World world, final List<?> list)
 	{
 		if (list == null || list.size() != 2)
 		{
 			return null;
 		}
-		
+
 		Object[] elements = list.toArray();
-		
+
 		for (int i = 0; i < elements.length; i++)
 		{
 			if (elements[i] == null || !(elements[i] instanceof Integer))
@@ -80,17 +80,17 @@ public final class ChunkLocation
 				return null;
 			}
 		}
-		
+
 		return new ChunkLocation(world, (Integer)elements[0], (Integer)elements[1]);
 	}
-	
+
 	public boolean isSame(final Chunk chunk)
 	{
 		if (chunk == null)
 		{
 			return world == null;
 		}
-		
+
 		return Objects.equals(world, chunk.getWorld()) && x == chunk.getX() && z == chunk.getZ();
 	}
 
@@ -102,7 +102,7 @@ public final class ChunkLocation
 			final ChunkLocation other = (ChunkLocation)obj;
 			return Objects.equals(world, other.world) && x == other.x && z == other.z;
 		}
-		
+
 		return super.equals(obj);
 	}
 

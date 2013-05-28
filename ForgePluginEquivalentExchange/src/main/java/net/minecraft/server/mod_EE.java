@@ -149,7 +149,7 @@ public class mod_EE extends NetworkMod
 
 		for (final EntityHuman player : players)
 		{
-			//doGemPowers(player);
+			doGemPowers(player);
 			doEquipCheck(player, var3);
 			doFireImmuneCheck(player);
 		}

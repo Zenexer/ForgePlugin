@@ -2,7 +2,6 @@ package ee;
 
 import static ee.EEMaps.isOreBlock;
 import net.minecraft.server.*;
-import org.bukkit.Bukkit;
 
 
 public class ItemRedPickaxe extends ItemRedTool
@@ -20,8 +19,6 @@ public class ItemRedPickaxe extends ItemRedTool
 	@Override
 	public float getStrVsBlock(ItemStack toolStack, Block block, int data)
 	{
-		System.out.println("getStrVsBlock");
-		Bukkit.broadcastMessage("getStrVsBlock");
 		float denominator = 1.0F;
 
 		if ((block.id == EEBlock.eePedestal.id && data == 0) || (block.id == EEBlock.eeStone.id && (data == 8 || data == 9)))

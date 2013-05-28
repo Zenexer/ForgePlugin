@@ -1,10 +1,10 @@
 package com.earth2me.minecraft.forgeplugin.commands;
 
 import com.earth2me.minecraft.forgeplugin.ForgePlugin;
+import com.earth2me.minecraft.forgeplugin.events.ChunkManager.Cleaner;
 import java.util.List;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -36,14 +36,10 @@ public final class ChunkCleanupCommand implements CommandExecutor
 
 		try
 		{
-			int count = 0;
-			int failed = 0;
-			for (World world : worlds)
-			{
-				final Chunk[] chunks = world.getLoadedChunks();
-				failed += cleanup(chunks);
-				count += chunks.length;
-			}
+			final Cleaner cleaner = plugin.getChunkManager().createCleaner();
+			cleaner.run();
+			final int count = cleaner.getCount();
+			final int failed = cleaner.getFailed();
 
 			final String format;
 			if (failed <= 0)
@@ -58,37 +54,15 @@ public final class ChunkCleanupCommand implements CommandExecutor
 			{
 				format = "%2$sFailed to schedule %4$d chunks for scanning.";
 			}
+
 			server.broadcastMessage(String.format(format, NORMAL_COLOR, FAIL_COLOR, count, failed));
 		}
 		catch (Throwable ex)
 		{
-			server.broadcastMessage(NORMAL_COLOR + "Cleanup failed!");
-			plugin.getLogger().log(Level.SEVERE, "Unable to complete chunk cleanup.", ex);
+			server.broadcastMessage(FAIL_COLOR + "Cleanup failed.");
+			plugin.getLogger().log(Level.SEVERE, "Unable to schedule chunk cleanup.", ex);
 		}
 
 		return true;
-	}
-
-	private int cleanup(final Chunk[] chunks)
-	{
-		int failed = 0;
-		for (final Chunk chunk : chunks)
-		{
-			int taskID = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					plugin.getChunkManager().checkSync(chunk);
-				}
-			});
-			
-			if (taskID < 0)
-			{
-				failed++;
-			}
-		}
-
-		return failed;
 	}
 }

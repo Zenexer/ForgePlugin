@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,7 +37,6 @@ public final class ItemMonitor implements IEventHandler
 		"craft",
 		"build",
 	};
-	
 	private static final transient int DEFAULT_INVENTORY_SCAN_INTERVAL = 20;
 	private final transient ForgePlugin plugin;
 	private transient int inventoryScanInterval = DEFAULT_INVENTORY_SCAN_INTERVAL;
@@ -58,8 +55,6 @@ public final class ItemMonitor implements IEventHandler
 	public void onEnabled()
 	{
 	}
-	
-	
 
 	@Override
 	public void onReload()
@@ -67,25 +62,25 @@ public final class ItemMonitor implements IEventHandler
 		for (final String list : lists)
 		{
 			final String path = "banned-items/" + list;
-			
+
 			try
 			{
 				final Set<ItemData> itemSet = getItemSet(path);
-				
+
 				switch (list)
 				{
 				case "all":
 					bannedAll = itemSet;
 					break;
-					
+
 				case "use":
 					bannedUse = itemSet;
 					break;
-					
+
 				case "craft":
 					bannedCraft = itemSet;
 					break;
-					
+
 				case "build":
 					bannedBuild = itemSet;
 					break;
@@ -96,7 +91,7 @@ public final class ItemMonitor implements IEventHandler
 				plugin.getLogger().log(Level.SEVERE, String.format("Invalid %s list.  Check your YAML syntax.", path));
 			}
 		}
-			
+
 		final FileConfiguration config = plugin.getConfig();
 		inventoryScanInterval = config.getInt("settings/inventory-scan-interval", DEFAULT_INVENTORY_SCAN_INTERVAL);
 
@@ -216,36 +211,36 @@ public final class ItemMonitor implements IEventHandler
 
 		return false;
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void onEntityInteract(final EntityInteractEvent e)
 	{
 		final Block block = e.getBlock();
-		
+
 		if (checkBlock(block))
 		{
 			e.setCancelled(true);
 		}
-		
+
 		final ItemData data = new ItemData(block);
 		if (isBannedUse(data) || isBannedAll(data))
 		{
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void onEntityChangeBlock(final EntityChangeBlockEvent e)
 	{
 		checkBlock(e.getBlock());
-		
+
 		final ItemData data = new ItemData(e.getTo().getId(), -1);
 		if (isBannedUse(data) || isBannedAll(data))
 		{
 			e.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void onItemSpawn(final ItemSpawnEvent e)
 	{
@@ -277,7 +272,7 @@ public final class ItemMonitor implements IEventHandler
 		checkBlock(e.getBlockAgainst());
 		checkBlock(e.getBlock());
 
-		if (checkBlock(e.getBlockPlaced()))
+		if (isBannedBuild(new ItemData(e.getItemInHand())) || checkBlock(e.getBlockPlaced()))
 		{
 			e.setCancelled(true);
 		}
@@ -307,27 +302,38 @@ public final class ItemMonitor implements IEventHandler
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void onInventoryClick(final InventoryClickEvent e)
 	{
-		if (isBannedAll(new ItemData(e.getCurrentItem())))
+		try
 		{
-			e.setResult(Event.Result.DENY);
-			e.setCancelled(true);
+			if (e.getSlot() >= e.getInventory().getSize())
+			{
+				return;
+			}
+
+			if (isBannedAll(new ItemData(e.getCurrentItem())))
+			{
+				e.setResult(Event.Result.DENY);
+				e.setCancelled(true);
+			}
+
+			final InventoryView inventory = e.getView();
+
+			if (isBannedAll(new ItemData(e.getCursor())))
+			{
+				inventory.setCursor(null);
+				e.setResult(Event.Result.DENY);
+				e.setCancelled(true);
+			}
+
+			final int slot = e.getSlot();
+			if (isBannedAll(new ItemData(inventory.getItem(slot))))
+			{
+				inventory.setItem(slot, null);
+				e.setResult(Event.Result.DENY);
+				e.setCancelled(true);
+			}
 		}
-
-		final InventoryView inventory = e.getView();
-
-		if (isBannedAll(new ItemData(e.getCursor())))
+		catch (Throwable ex)
 		{
-			inventory.setCursor(null);
-			e.setResult(Event.Result.DENY);
-			e.setCancelled(true);
-		}
-
-		final int slot = e.getSlot();
-		if (isBannedAll(new ItemData(inventory.getItem(slot))))
-		{
-			inventory.setItem(slot, null);
-			e.setResult(Event.Result.DENY);
-			e.setCancelled(true);
 		}
 	}
 

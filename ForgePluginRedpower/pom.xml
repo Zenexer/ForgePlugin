@@ -63,6 +63,11 @@
 								<filter>
 									<artifact>Tekkit:Redpower</artifact>
 									<excludes>
+										<exclude>eloraam/core/TubeFlow.class</exclude>
+										<exclude>eloraam/core/TubeFlow$TubeScheduleContext.class</exclude>
+										<exclude>eloraam/core/TubeItem.class</exclude>
+										<exclude>eloraam/machine/TileTube.class</exclude>
+										<exclude>eloraam/machine/TileTube$1.class</exclude>
 									</excludes>
 								</filter>
 							</filters>

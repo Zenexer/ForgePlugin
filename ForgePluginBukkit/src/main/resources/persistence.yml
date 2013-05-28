@@ -1,0 +1,13 @@
+# Persistence configuration file for ForgePlugin.
+# Note that this file may be modified programmatically.
+---
+# These regions will always stay loaded.  Coordinates are in [X, Z] format, and are chunk coordinates: that means
+# that you need to take block coordinates and divide by 16 (or use the /ispersistent command).  Ranges are
+# specified in the form [world, [X1, Z1], [X2, Z2]].  To load just one chunk, specify a single location: [world, 2, 4]
+# To see if the chunk that you are in is persistently loaded, use the /ispersistent (alias: /isp) command.  It will
+# also give you the coordinates of the chunk, which you can use here in your list.
+persistent-regions: []
+  # Just some examples:
+  #   - [world_nether, [128, 192], [127, 196]]
+  #   - [world, [128, -192], [127, -196]]
+  #   - [world_the_end, -3, 2]

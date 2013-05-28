@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import lombok.Getter;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -33,6 +34,9 @@ public final class ChunkManager implements IEventHandler
 	private transient Set<ChunkRange> persistentRanges;
 	private transient int recheckDelayTicks;
 	private transient int entitiesCheckLimit;
+	private transient int chunkCleanerTask = -1;
+	private transient Cleaner cleaner;
+	private transient int chunkCleanTicks;
 
 	public ChunkManager(final ForgePlugin plugin)
 	{
@@ -46,90 +50,111 @@ public final class ChunkManager implements IEventHandler
 		viewDistance = server.getViewDistance();
 
 		final FileConfiguration config = plugin.getConfig();
-
-		recheckDelayTicks = config.getInt("settings/recheck-delay", 3) * 20 * 60; // Default: Three minutes
+		recheckDelayTicks = (int)(config.getDouble("settings/recheck-delay", 1) * 20 * 60);
 		entitiesCheckLimit = config.getInt("settings/entities-check-limit", -1);
 		final int maxChunksPerRange = config.getInt("settings/max-chunks-per-range", 100);
+		chunkCleanTicks = (int)(config.getDouble("settings/chunk-clean-interval", 5) * 20 * 60);
 
 		final Set<ChunkLocation> persistentLocations = new HashSet<>();
 		final Set<ChunkRange> persistentRanges = new HashSet<>();
 
-		final List<?> persistentChunks = config.getList("persistent-chunks");
-		if (persistentChunks != null)
+		final FileConfiguration persistentConfig = plugin.loadConfig("persistence.yml");
+		if (persistentConfig == null)
 		{
-			int itemId = 0;
-			for (Object item : persistentChunks)
+			plugin.getLogger().log(Level.WARNING, "Persistence configuration (persistence.yml) could not be loaded.");
+		}
+		else
+		{
+			final List<?> persistentRegions = persistentConfig.getList("persistent-regions", null);
+			if (persistentRegions != null)
 			{
-				itemId++;
-				
-				if (item == null || !(item instanceof List<?>))
+				int itemId = 0;
+				for (Object item : persistentRegions)
 				{
-					plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks contains a null or non-list item.", itemId));
-					continue;
-				}
+					itemId++;
 
-				final List<?> list = (List<?>)item;
-				if (list.size() != 3)
-				{
-					plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d has the wrong number of elements in its array.", itemId));
-					continue;
-				}
-
-				final Object[] elements = list.toArray();
-				for (int i = 0; i < elements.length; i++)
-				{
-					if (elements[i] == null)
+					if (item == null || !(item instanceof List<?>))
 					{
-						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d has a null element.", itemId));
-						continue;
-					}
-				}
-
-				if (!(elements[0] instanceof String))
-				{
-					plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d has a world name that is not a String.", itemId));
-					continue;
-				}
-
-				if (elements[1] instanceof Integer && elements[2] instanceof Integer)
-				{
-					final ChunkLocation location = ChunkLocation.parse(list);
-					if (location == null)
-					{
-						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d uses an invalid chunk location syntax.", itemId));
+						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks contains a null or non-list item.", itemId));
 						continue;
 					}
 
-					persistentLocations.add(location);
-				}
-				else if (elements[1] instanceof List<?> && elements[2] instanceof List<?>)
-				{
-					final ChunkRange range = ChunkRange.parse(list);
-					if (range == null)
+					final List<?> list = (List<?>)item;
+					if (list.size() != 3)
 					{
-						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d uses an invalid chunk range syntax.", itemId));
+						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d has the wrong number of elements in its array.", itemId));
 						continue;
 					}
 
-					final ChunkLocation start = range.getStart();
-					final ChunkLocation end = range.getEnd();
-					if ((end.getX() - start.getX()) * (end.getZ() - start.getZ()) > maxChunksPerRange)
+					final Object[] elements = list.toArray();
+					for (int i = 0; i < elements.length; i++)
 					{
-						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d contains too many chunks.  (Max: %d)", itemId, maxChunksPerRange));
+						if (elements[i] == null)
+						{
+							plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d has a null element.", itemId));
+							continue;
+						}
+					}
+
+					if (!(elements[0] instanceof String))
+					{
+						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d has a world name that is not a String.", itemId));
 						continue;
 					}
 
-					persistentRanges.add(range);
-				}
-				else
-				{
-					plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d contains elements of invalid types.", itemId));
+					if (elements[1] instanceof Integer && elements[2] instanceof Integer)
+					{
+						final ChunkLocation location = ChunkLocation.parse(list);
+						if (location == null)
+						{
+							plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d uses an invalid chunk location syntax.", itemId));
+							continue;
+						}
+
+						persistentLocations.add(location);
+					}
+					else if (elements[1] instanceof List<?> && elements[2] instanceof List<?>)
+					{
+						final ChunkRange range = ChunkRange.parse(list);
+						if (range == null)
+						{
+							plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d uses an invalid chunk range syntax.", itemId));
+							continue;
+						}
+
+						final ChunkLocation start = range.getStart();
+						final ChunkLocation end = range.getEnd();
+						if ((end.getX() - start.getX()) * (end.getZ() - start.getZ()) > maxChunksPerRange)
+						{
+							plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d contains too many chunks.  (Max: %d)", itemId, maxChunksPerRange));
+							continue;
+						}
+
+						persistentRanges.add(range);
+					}
+					else
+					{
+						plugin.getLogger().log(Level.WARNING, String.format("Configuration: persistent-chunks item %d contains elements of invalid types.", itemId));
+					}
 				}
 			}
 		}
 
 		this.persistentLocations = persistentLocations;
 		this.persistentRanges = persistentRanges;
+
+		final BukkitScheduler scheduler = server.getScheduler();
+
+		if (chunkCleanerTask >= 0 && (scheduler.isQueued(chunkCleanerTask) || scheduler.isCurrentlyRunning(chunkCleanerTask)))
+		{
+			scheduler.cancelTask(chunkCleanerTask);
+		}
+
+		if (chunkCleanTicks > 0)
+		{
+			cleaner = createCleaner();
+			cleaner.scheduleRepeating();
+		}
 	}
 
 	@Override
@@ -187,7 +212,7 @@ public final class ChunkManager implements IEventHandler
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onChunkLoad(final ChunkLoadEvent e)
 	{
-		checkSync(e.getChunk(), recheckDelayTicks);
+		checkChunk(e.getChunk(), recheckDelayTicks);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -197,10 +222,10 @@ public final class ChunkManager implements IEventHandler
 		if (isPersistent(chunk) || hasPlayer(chunk))
 		{
 			e.setCancelled(true);
-			
+
 			// Incoming manual override!  This is just because we are so cool and hackish and clearly nobody else
 			// has any valid reason to ever contradict us.  Damn, boy, that is some bad ethics!
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable()
+			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 			{
 				@Override
 				public void run()
@@ -279,51 +304,56 @@ public final class ChunkManager implements IEventHandler
 		return false;
 	}
 
-	private void loadChunks(final Player player, Location location)
+	@SuppressWarnings("AssignmentToMethodParameter")
+	private void loadChunks(final Player player, Location loc)
 	{
-		if (location == null && player == null)
+		if (loc == null && player == null)
 		{
 			return;
 		}
 
-		if (location == null)
-		{
-			location = player.getLocation();
-		}
+		final Location location = loc == null ? player.getLocation() : loc;
 
-		final World world = location.getWorld();
-		final int originX = location.getBlockX() >> 4;
-		final int originZ = location.getBlockZ() >> 4;
-
-		for (int x = originX - viewDistance; x <= originX + viewDistance; x++)
+		server.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable()
 		{
-			for (int z = originZ - viewDistance; z <= originZ + viewDistance; z++)
+			@Override
+			public void run()
 			{
-				final int fx = x;
-				final int fz = z;
-				server.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+				final World world = location.getWorld();
+				final int originX = location.getBlockX() >> 4;
+				final int originZ = location.getBlockZ() >> 4;
+
+				for (int x = originX - viewDistance; x <= originX + viewDistance; x++)
 				{
-					@Override
-					public void run()
+					for (int z = originZ - viewDistance; z <= originZ + viewDistance; z++)
 					{
-						world.loadChunk(fx, fz, true);
+						final int fx = x;
+						final int fz = z;
+						server.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								world.loadChunk(fx, fz, true);
+							}
+						});
 					}
-				});
+				}
 			}
-		}
+		});
 	}
 
-	public void checkSync(final Chunk chunk)
+	public void checkChunk(final Chunk chunk)
 	{
-		server.getScheduler().scheduleSyncDelayedTask(plugin, new Checker(chunk));
+		server.getScheduler().scheduleAsyncDelayedTask(plugin, new Checker(chunk));
 	}
 
-	public void checkSync(final Chunk chunk, final long ticks)
+	public void checkChunk(final Chunk chunk, final long ticks)
 	{
-		server.getScheduler().scheduleSyncDelayedTask(plugin, new Checker(chunk), ticks);
+		server.getScheduler().scheduleAsyncDelayedTask(plugin, new Checker(chunk), ticks);
 	}
 
-	public boolean isChunkNeeded(final Chunk chunk)
+	public boolean isChunkNeeded(final Chunk chunk, Player[] players)
 	{
 		if (chunk == null)
 		{
@@ -339,7 +369,7 @@ public final class ChunkManager implements IEventHandler
 		final int chunkX = chunk.getX();
 		final int chunkZ = chunk.getZ();
 
-		for (Player player : world.getPlayers())
+		for (Player player : players)
 		{
 			final Chunk chunkLocation = player.getLocation().getChunk();
 			final int dx = Math.abs(chunkX - chunkLocation.getX());
@@ -378,6 +408,68 @@ public final class ChunkManager implements IEventHandler
 		return false;
 	}
 
+	public Cleaner createCleaner()
+	{
+		return new Cleaner();
+	}
+
+
+	public final class Cleaner implements Runnable
+	{
+		@Getter
+		private int failed;
+		@Getter
+		private int count;
+
+		public void scheduleRepeating()
+		{
+			chunkCleanerTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, chunkCleanTicks, chunkCleanTicks);
+		}
+
+		@Override
+		public void run()
+		{
+			final World[] worlds = plugin.getServer().getWorlds().toArray(new World[0]);
+
+			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					for (World world : worlds)
+					{
+						final Chunk[] chunks = world.getLoadedChunks();
+						failed += scheduleCleanup(chunks);
+						count += chunks.length;
+					}
+				}
+			});
+		}
+
+		private int scheduleCleanup(final Chunk[] chunks)
+		{
+			int failed = 0;
+			for (final Chunk chunk : chunks)
+			{
+				int taskID = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						checkChunk(chunk);
+					}
+				});
+
+				if (taskID < 0)
+				{
+					failed++;
+				}
+			}
+
+			return failed;
+		}
+	}
+
 
 	private final class Checker implements Runnable
 	{
@@ -391,10 +483,35 @@ public final class ChunkManager implements IEventHandler
 		@Override
 		public void run()
 		{
-			if (!isChunkNeeded(chunk))
+			final BukkitScheduler scheduler = plugin.getServer().getScheduler();
+
+			scheduler.scheduleSyncDelayedTask(plugin, new Runnable()
 			{
-				chunk.getWorld().unloadChunk(chunk);
-			}
+				@Override
+				public void run()
+				{
+					final Player[] players = chunk.getWorld().getPlayers().toArray(new Player[0]);
+
+					scheduler.scheduleAsyncDelayedTask(plugin, new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							if (!isChunkNeeded(chunk, players))
+							{
+								plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+								{
+									@Override
+									public void run()
+									{
+										chunk.getWorld().unloadChunk(chunk);
+									}
+								});
+							}
+						}
+					});
+				}
+			});
 		}
 	}
 }

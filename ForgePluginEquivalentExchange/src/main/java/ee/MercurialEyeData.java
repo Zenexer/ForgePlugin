@@ -1,18 +1,8 @@
 package ee;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import net.minecraft.server.EntityHuman;
-import net.minecraft.server.EntityItem;
-import net.minecraft.server.IInventory;
-import net.minecraft.server.Item;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.World;
-import net.minecraft.server.WorldMapBase;
+import net.minecraft.server.*;
 import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
@@ -88,7 +78,6 @@ public class MercurialEyeData extends WorldMapBase
 		{
 			EntityItem var3 = new EntityItem(player.world, player.locX, player.locY, player.locZ, var2);
 			player.world.addEntity(var3);
-			var2 = null;
 		}
 		else
 		{

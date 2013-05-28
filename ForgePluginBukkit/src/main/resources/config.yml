@@ -1,12 +1,11 @@
-# Configuration for ForgePlugin.
+# Main configuration for ForgePlugin.
 ---
-
 # General settings.
 # Note: At optimal performance levels, there are 20 ticks per second.
 settings:
   # After a chunk is loaded, it will be re-checked to ensure that it should be remain loaded.  Specify the number of
-  # minutes (ticks-per-second-dependent) before that check occurs.  Negative to disable (default).
-  recheck-delay: 3
+  # MINUTES (ticks-per-second-dependent) before that check occurs.  Useful when players are exploring.
+  recheck-delay: 1
 
   # If there are more than this many entities in a chunk when it is unloaded, it won't be checked for remaining players.
   entity-check-limit: -1
@@ -14,32 +13,48 @@ settings:
   # Maximum number of chunks that a persistent chunk range can contain.
   max-chunks-per-range: 100
 
-  # Time in ticks between inventory scans.  After this number of ticks, the plugin will scan all players' hands for
+  # Time in TICKS between inventory scans.  After this number of ticks, the plugin will scan all players' hands for
   # banned items.
   inventory-scan-interval: 20
 
+  # Time in MINUTES between complete chunk scans.  Every chunk is checked for players; if none are found in a chunks,
+  # and it is not in a persistently loaded region, the chunk is forcefully unloaded.  If you know how to do so, you
+  # should automate this as a cronjob (Linux) or scheduled task (Windows), as the timing of the built-in system is only
+  # accurate at 20 TPS.  (Have the task/cronjob run the /cc command.)  Don't forget to disable the built in system by
+  # specifying a negative value here if you plan on using your own timed system.  Warning: Disabling this and not
+  # running the /cc command periodically will quickly exhaust your RAM--sort of like Tekkit without this plugin.
+  # CraftBukkit added this feature around 1.5, but there's no support for Tekkit Classic, obviously.
+  chunk-clean-interval: 5
+
 # Cleans up after bugs that rapidly spawn items.
 entity-overflow:
-  # Time in ticks between entity scans.  After this number of ticks, the plugin will scan all chunks for entity
-  # overflows.
-  scan-interval: 200
+  # Time in seconds between entity scans.  After this number of ticks, the plugin will scan all chunks for entity
+  # overflows.  Set to -1 to disable.
+  scan-interval: 5
 
-  # Exceeding this number of entities in one chunk will result in it being cleared of most types of entities.
-  max-entities: 300
+  # Exceeding this number of entities in one chunk will result in it being cleared of most types of entities.  Set to
+  # -1 to disable.  Even if scan-interval is negative, this will still have an effect when entities are individually
+  # spawned: if the chunk currently meets or exceeds this number, new entities cannot be spawned normally.  Mods can
+  # bypass this, hence the scanner.
+  max-entities: 150
 
-  # This delay must occur between item drops in the same chunk, or they won't be counted.
-  min-item-interval: -1;
+  # This delay must occur between item drops in the same chunk, or they will be ignored.  Separate from scanning.
+  # This will prevent players from dropping items too quickly, so ensure that players know that it is enabled.
+  # Negative value disables.  Set to -1 to disable; disabled by default.
+  min-item-interval: -1
 
-# These chunks will always stay loaded.  Coordinates are in [world, X, Z] format, and are chunk coordinates: that means
-# that you need to take block coordinates and divide by 16 (or, more formally, bitwise right shift by 4).  Ranges can be
-# specified in the form [world, [X1, Z1], [X2, Z2]].
-persistent-chunks:
-  # Zenexer's flowers and factory at the old spawn; /home Zenexer:flowers, /home Zenexer:factory, /warp oldspawn
-  - [world, [-24, -99], [-22, -98]]
-  # Zenexer's flowers and factory at his house: /home Zenexer:home, /home Zenexer:roof
-  - [world, [-3, -124], [0, -127]]
-  # kbop451's flower towers: /home kbop451:diamond
-  - [world, [-71, 20], [-70, 21]]
+  # Delay in seconds before the threshold is reset to that specified by entity-overflow.max-entities after being
+  # automatically increased.  A temporary increase will occur if too many players are in one chunk, so as to prevent
+  # the abnormal increase in players from triggering the entity overflow mechanism.  The increase gets triggered when
+  # max-entities is exceeded *and* the number of players in the chunk exceeds max-players-before-increase.  Set to
+  # 0 to prevent the threshold from ever reseting (equivalent to infinite delay).  Set to -1 to disable the increased
+  # threshold mechanism.
+  threshold-reset-delay: 30
+
+  # Used to determine when there is an excessive number of players in a chunk, so as to prevent too many
+  # players from repeatedly triggering the entity overflow mechanism.  See threshold-reset-delay for more information
+  # about this feature.
+  max-players-before-increase: 50
 
 # Items take the format "ID:data".  They will be removed if the player interacts.  Use ID:0  if you only want to ban
 # the item with data value 0.  IDs lacking data values or with a data value of -1 will ban all data values for that ID.
@@ -50,62 +65,62 @@ persistent-chunks:
 banned-items:
   # These items/blocks are auto-removed.  Items listed here are automatically added to the other lists.
   all:
-    - 181:5 Crystal Chest - Kills TPS (server-side) under certain circumstances
-    - 19762 Crystal Chest Upgrade - Useless without crystal chests
-    - 239 Industrial TNT (ITNT) - Explosive
-    - 7270 TNT Cart - Explosive
-    - 126:10 Nova Catalyst - Explosive
-    - 126:11 Nova Cataclysm - Explosive
-    - 30208:* Mining Laser - Mass destruction
-    - 26522 Dynamite - Explosive
-    - 30215 Dynamite - Explosive
-    - 30213 Dynomite-O-Mote - Useless given ban on dynamite
-    - 30214 Sticky Dynamite - Explosive
-    - 27582 Hurricane Boots - Invincibility and miscellaneous trouble
-    - 27581 Gravity Greaves - Invincibility and miscellaneous trouble
-    - 27579 Infernal Armour - Invincibility and miscellaneous trouble
-    - 27580 Abyss Helmet - Invincibility and miscellaneous trouble
-    - 27527:* Destruction Catalyst - Mass destruction
-    - 27556:* Catalytic Lens - Mass destruction
-    - 27535:* Hyperkinetic Lens - Mass destruction
-    - 214:0 World Anchor - This allows a player to keep unlimited chunks loaded.  Use Dimensional Anchors instead.
-    - 27573:* Red Morning Star - Mass destruction
-    - 27570:* Red Matter Hammer - Mass destruction
-    - 27555:* Dark Matter Hammer - Massive destruction
-    - 27583:* Mercurial Eye - Mass alteration
-    - 237 Nuke - Explosive
-    - 27533 Ring of Ignition - Mass alteration
-    - 27574 Zero Ring - Mass alteration
-    - 27531 Volcanite Amulet - Mass alteration
-    - 27530 Evertide Amulet - Mass alteration
-    - 27584 Ring of Arcana - Mass alteration
-    - 27593 Void Ring - Mass destruction
-    - 27537 Harvest Goddess Band - Mass alteration
-    - 166:* BuildCraft Pipes (block) - Lag
-    - 4300 Advanced Insertion Pipe (item) - Lag
-    - 4301 Advanced Wooden Transport Pipe (item) - Lag
-    - 4302 Distribution Transport Pipe (item) - Lag
-    - 4303 Item Teleport Pipe (item) - Lag
-    - 4304 Waterproof Teleport Pipe (item) - Lag
-    - 4305 Power Teleport Pipe (item) - Lag
-    - 4307 Cobblestone Transport Pipe (item) - Lag
-    - 4308 Stone Transport Pipe (item) - Lag
-    - 4309 Iron Transport Pipe (item) - Lag
-    - 4310 Golden Transport Pipe (item) - Lag
-    - 4311 Diamond Transport Pipe (item) - Lag
-    - 4312 Obsidian Transport Pipe (item) - Lag
-    - 4313 Wooden Waterproof Pipe (item) - Lag
-    - 4314 Cobblestone Waterproof Pipe (item) - Lag
-    - 4315 Stone Waterproof Pipe (item) - Lag
-    - 4316 Iron Waterproof Pipe (item) - Lag
-    - 4317 Golden Waterproof Pipe (item) - Lag
-    - 4322 Stone Conductive Pipe (item) - Lag
-    - 4324 Golden Conductive Pipe (item) - Lag
-    - 27538 Watch Of Flowing Time (item) - Lag and nuisance to other players
+    - 181:5 Crystal Chest - Lag (server-side) under certain circumstances [To be removed, pending fix]
+    - 19762 Crystal Chest Upgrade - Useless without crystal chests [To be removed, pending fix]
+    - 194:2 Black Hole Chest - Tons of irreparable damage, including world corruption.  Partially client-side, so no fix.
+    - 239 Industrial TNT (ITNT) - Explosive; bypasses block protection [To be removed, pending fix]
+    - 7270 TNT Cart - Explosive; might bypass block protection (untested) [To be removed, pending fix]
+    - 126:10 Nova Catalyst - Explosive; bypasses block protection [To be removed, pending fix]
+    - 126:11 Nova Cataclysm - Explosive; bypasses block protection [To be removed, pending fix]
+    - 30208:* Mining Laser - Mass destruction; might bypass block protection (untested) [To be removed, pending fix]
+    - 26522 Dynamite - Explosive; bypasses block protection [To be removed, pending fix]
+    - 30215 Dynamite - Explosive; bypasses block protection [To be removed, pending fix]
+    - 30213 Dynomite-O-Mote - Useless given ban on dynamite [To be removed, pending fix]
+    - 30214 Sticky Dynamite - Explosive; bypasses block protection [To be removed, pending fix]
+    - 27582 Hurricane Boots - Invincibility and miscellaneous trouble due to bugs [To be removed, pending fix]
+    - 27581 Gravity Greaves - Invincibility and miscellaneous trouble due to bugs [To be removed, pending fix]
+    - 27579 Infernal Armour - Invincibility and miscellaneous trouble due to bugs [To be removed, pending fix]
+    - 27580 Abyss Helmet - Invincibility and miscellaneous trouble due to bugs [To be removed, pending fix]
+    - 27527:* Destruction Catalyst - Mass destruction; bypasses block protection [To be removed, pending fix]
+    - 27556:* Catalytic Lens - Mass destruction; bypasses block protection [To be removed, pending fix]
+    - 27535:* Hyperkinetic Lens - Mass destruction; bypasses block protection [To be removed, pending fix]
+    - 214:0 World Anchor - Ask an admin to persistently load a chunk for you.  These won't work. [Won't remove]
+    #- 4095 Dimensional Anchor - Useful as markers, so commented out; otherwise, see above. [Removed]
+    - 7303 World Anchor Cart - See World Anchor. [Won't remove]
+    - 27583:* Mercurial Eye - Mass alteration; bypasses block protection [To be removed, pending fix]
+    - 237 Nuke - Explosive; bypasses block protection [To be removed, pending fix]
+    - 27533 Ring of Ignition - Mass alteration; bypasses block protection [Pending fix; won't remove]
+    - 27574 Zero Ring - Mass alteration; bypasses block protection [Pending fix; won't remove]
+    - 27593 Void Ring - Mass destruction; bypasses block protection [Pending fix; won't remove]
+    - 27538 Watch Of Flowing Time - Lag and nuisance to other players; disabled by ForgePluginEquivalentExchange due to slow processing [Won't fix; won't remove]
+    - 27531 Volcanite Amulet - Mass alteration; bypasses block protection [Pending fix; won't remove]
+    - 27530 Evertide Amulet - Mass alteration; bypasses block protection [Pending fix; won't remove]
+    - 27584 Ring of Arcana - Mass alteration; bypasses block protection [Pending fix; won't remove]
+    - 27537 Harvest Goddess Band - Mass alteration; bypasses block protection [Pending fix; won't remove]
+    - 166:* BuildCraft Pipes (block) - Lag, buggy [To be removed, pending fix]
+    - 4300 Advanced Insertion Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4301 Advanced Wooden Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4302 Distribution Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4303 Item Teleport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4304 Waterproof Teleport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4305 Power Teleport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4307 Cobblestone Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4308 Stone Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4309 Iron Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4310 Golden Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4311 Diamond Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4312 Obsidian Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4314 Cobblestone Waterproof Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4315 Stone Waterproof Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4316 Iron Waterproof Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4317 Golden Waterproof Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4322 Stone Conductive Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4324 Golden Conductive Pipe (item) - Lag, buggy [To be removed, pending fix]
 
-  # These items/blocks can't be used.  Right-click won't work.
+  # These items/blocks can't be used.  Right-click won't work.  Warning: For EE items, release charge will still work.
   use:
-    - 27526 Philosopher's Stone - Mass alteration
+    - 4307 Wooden Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4313 Wooden Waterproof Pipe (item) - Lag, buggy [To be removed, pending fix]
 
   # These items/blocks can't be crafted, but they can still be used.  This might not work with some mods, so you should
   # usually ban items altogether.  For example, Equivalent Exchange allows players to create items without crafting.
@@ -113,4 +128,6 @@ banned-items:
 
   # These blocks can't be placed, but they can be crafted.  Some items, like paintings, are placed as entities; this
   # probably won't work for such items.
-  build: []
+  build:
+    - 4307 Wooden Transport Pipe (item) - Lag, buggy [To be removed, pending fix]
+    - 4313 Wooden Waterproof Pipe (item) - Lag, buggy [To be removed, pending fix]

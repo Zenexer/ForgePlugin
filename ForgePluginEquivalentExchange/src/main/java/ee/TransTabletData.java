@@ -168,7 +168,7 @@ public class TransTabletData extends WorldMapBase implements IInventory
 			}
 
 			final int itemEmc = EEMaps.getEMC(item.getTypeId(), item.getData());
-			if (itemEmc > 0 && totalEmc >= itemEmc && !item.equals(isNot) && (target == null || itemEmc <= targetEmc) /*&& playerKnows(item.getTypeId(), item.getData())*/)
+			if (itemEmc > 0 && totalEmc >= itemEmc && !item.equals(isNot) && (target == null || itemEmc <= targetEmc) && playerKnows(item.getTypeId(), item.getData()))
 			{
 				final ItemStack itemStack = new ItemStack(item.getTypeId(), 1, item.getData());
 				if (matchesLock(itemStack))

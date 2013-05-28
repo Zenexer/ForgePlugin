@@ -45,9 +45,16 @@ public final class EventLogger implements IEventHandler
 	{
 		logCommand("Remote", e.getSender().getName(), e.getCommand());
 	}
-	
+
 	private void logCommand(final String type, final String sender, final String command)
 	{
-		plugin.getLogger().log(Level.INFO, String.format("[%s:%s] %s", type, sender, command));
+		plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				plugin.getLogger().log(Level.INFO, String.format("[%s:%s] %s", type, sender, command));
+			}
+		});
 	}
 }
