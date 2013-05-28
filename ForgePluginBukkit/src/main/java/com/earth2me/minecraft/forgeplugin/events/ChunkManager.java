@@ -6,6 +6,7 @@ import com.earth2me.minecraft.forgeplugin.ForgePlugin;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import lombok.Getter;
 import org.bukkit.Chunk;
@@ -416,11 +417,6 @@ public final class ChunkManager implements IEventHandler
 
 	public final class Cleaner implements Runnable
 	{
-		@Getter
-		private int failed;
-		@Getter
-		private int count;
-
 		public void scheduleRepeating()
 		{
 			chunkCleanerTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, chunkCleanTicks, chunkCleanTicks);
@@ -429,18 +425,65 @@ public final class ChunkManager implements IEventHandler
 		@Override
 		public void run()
 		{
-			final World[] worlds = plugin.getServer().getWorlds().toArray(new World[0]);
+			final Server server = plugin.getServer();
+			final BukkitScheduler scheduler = server.getScheduler();
+			final World[] worlds = server.getWorlds().toArray(new World[0]);
 
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable()
+			scheduler.scheduleAsyncDelayedTask(plugin, new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					for (World world : worlds)
+					try
 					{
-						final Chunk[] chunks = world.getLoadedChunks();
-						failed += scheduleCleanup(chunks);
-						count += chunks.length;
+						int failCounter = 0;
+						int chunkCounter = 0;
+
+						for (World world : worlds)
+						{
+							final Chunk[] chunks = world.getLoadedChunks();
+							failCounter += scheduleCleanup(chunks);
+							chunkCounter += chunks.length;
+						}
+
+						final int failCount = failCounter;
+						final int chunkCount = chunkCounter;
+
+						scheduler.scheduleSyncDelayedTask(plugin, new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								final String format;
+								if (failCount <= 0)
+								{
+									format = "%1$sScanning %3$d chunks passively.  TPS may drop temporarily.";
+								}
+								else if (chunkCount > 0)
+								{
+									format = "%1$sScanning %3$d chunks passively.  %2$sFailed to schedule %4$d chunks for scanning.";
+								}
+								else
+								{
+									format = "%2$sFailed to schedule %4$d chunks for scanning.";
+								}
+
+								server.broadcastMessage(String.format(format, ForgePlugin.NORMAL_COLOR, ForgePlugin.FAIL_COLOR, chunkCount, failCount));
+							}
+						});
+					}
+					catch (Throwable ex)
+					{
+						plugin.getLogger().log(Level.SEVERE, "Unable to perform chunk cleanup.", ex);
+
+						scheduler.scheduleSyncDelayedTask(plugin, new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								server.broadcastMessage(ForgePlugin.FAIL_COLOR + "Chunk cleanup failed.");
+							}
+						});
 					}
 				}
 			});

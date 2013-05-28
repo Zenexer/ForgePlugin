@@ -34,6 +34,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ForgePlugin extends JavaPlugin
 {
+	public final static transient ChatColor NORMAL_COLOR = ChatColor.LIGHT_PURPLE;
+	public final static transient ChatColor FAIL_COLOR = ChatColor.RED;
+
 	@Getter
 	private transient ItemMonitor itemMonitor;
 	@Getter
