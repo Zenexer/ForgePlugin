@@ -50,10 +50,8 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${dir.artifacts}</outputDirectory>
-							<outputFile>${dir.artifacts}/mod_${project.artifactId}.jar</outputFile>
 							<minimizeJar>false</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
+							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<artifactSet>
 								<includes>
 									<include>Tekkit:EE2Server</include>
@@ -66,6 +64,8 @@
 										<exclude>ee/AlchemyBagData.class</exclude>
 										<exclude>ee/ContainerRMFurnace.class</exclude>
 										<exclude>ee/ContainerTransmutation.class</exclude>
+										<exclude>ee/EEBase.class</exclude>
+										<exclude>ee/EEBase$1.class</exclude>
 										<exclude>ee/ItemDarkAxe.class</exclude>
 										<exclude>ee/ItemDarkHammer.class</exclude>
 										<exclude>ee/ItemDarkHoe.class</exclude>
@@ -87,6 +87,7 @@
 										<exclude>ee/TileRMFurnace.class</exclude>
 										<exclude>ee/TransTabletData.class</exclude>
 										<exclude>net/minecraft/server/EEProxy.class</exclude>
+										<exclude>net/minecraft/server/EEProxy$TTGroup.class</exclude>
 										<exclude>net/minecraft/server/mod_EE.class</exclude>
 									</excludes>
 								</filter>

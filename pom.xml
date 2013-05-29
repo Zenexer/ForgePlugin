@@ -15,6 +15,7 @@
 		<module>ForgePluginEquivalentExchange</module>
 		<module>ForgePluginRedpower</module>
 		<module>ForgePluginTubeStuff</module>
+		<module>Assembly</module>
 	</modules>
 
 	<developers>
@@ -65,7 +66,12 @@
 	</repositories>
 
 	<properties>
-		<dir.artifacts>${project.basedir}/../artifacts</dir.artifacts>
+		<dir.base>${project.basedir}/..</dir.base>
+		<dir.artifacts.individual>${project.basedir}/../artifacts/individual</dir.artifacts.individual>
+		<dir.artifacts.packaged>${project.basedir}/../artifacts/packaged</dir.artifacts.packaged>
+
+		<assembly.all.individual>${project.basedir}/../Assembly/assembly/all-individual.xml</assembly.all.individual>
+		<assembly.all.packaged>${project.basedir}/../Assembly/assembly/all-packaged.xml</assembly.all.packaged>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -110,9 +116,9 @@
 		</dependency>
 		<!-- Replaced by technic-pack:tekkit -->
 		<!--dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.2.5-R4.0</version>
+  			<groupId>org.bukkit</groupId>
+  			<artifactId>bukkit</artifactId>
+  			<version>1.2.5-R4.0</version>
 		</dependency-->
 		<dependency>
 			<groupId>technic-pack</groupId>
@@ -158,4 +164,22 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+						<descriptors>
+							<descriptor>${assembly.all.individual}</descriptor>
+							<descriptor>${assembly.all.packaged}</descriptor>
+						</descriptors>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>

@@ -20,7 +20,7 @@ commands:
     aliases:
       - cc
     usage: /<command>
-    description: Forcefully unloads extraneous chunks.
+    description: Passively unload all chunks that aren't near online players.
   ispersistent:
     aliases:
       - isp

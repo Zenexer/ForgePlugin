@@ -13,9 +13,40 @@ ForgePlugin offers enhancements and fixes for a variety of Tekkit Classic compon
 Installation
 ============
 
-1. Add ForgePluginBukkit.jar to your plugins folder.
-2. Add the mod_*.jar files to your mods folder.
-3. Remove original copies of mods that have been replaced by the mod_*.jar files.  This step is important: if you encounter errors, you most likely forgot to do this, or you missed a mod.
+1. Download and extract the ForgePlugin `zip` file.
+2. Add the `jar` files in the newly extracted `plugins` folder to your server's `plugins` folder.
+3. Add the `jar` files in the newly extracted `mods` folder to your server's `mods` folder.
+4. Delete the old mods from your server's `mods` folder that have been replaced:
+	* Equivalent Exchange
+	* Railcraft
+	* Redpower
+	* TubeStuff
+5. Restart your server.
+6. Edit the `yml` files in your server's `plugins/ForgePlugin` folder as appropriate.  Missing entries will be reset to the default value.
+7. Run `/fp reload` to load the new configuration files.
+
+
+Commands
+========
+
+* **/forgeplugin reload** or **/fp r**: Reloads ForgePlugin's configuration files without restarting the server.
+* **/forgeplugin version** or **/fp v**: Displays version information about ForgePlugin.
+* **/chunkcleanup** or **/cc**: Passively unload all chunks that aren't near online players, because Tekkit isn't good at doing this automatically.  Persistent chunks will remain loaded.  This runs automatically every five minutes by default.
+* **/ispersistent** or **/isp**: Determines whether the current chunk is part of a persistent region.  Also displays chunk coordinates for current position.
+
+
+Permissions
+===========
+
+forgePlugin integrates with Vault, and will fall back to SuperPerms if Vault is not present.  ForgePlugin is primarily tested with GroupManager, but should work with most Vault-compatible permission systems.
+
+We do not support PermissionsEx (PEx) integration, and discourage its use due to instability, particularly with mods.
+
+* **forgeplugin.forgeplugin**: Required to use the `/forgeplugin` command and all sub-commands.
+* **forgeplugin.forgeplugin.reload**: Required to use the `/forgeplugin reload` sub-command.  Only useful if combined with `forgeplugin.forgeplugin`.
+* **forgeplugin.forgeplugin.version**: Required to use the `/forgeplugin version` sub-command.  Only useful if combined with `forgeplugin.forgeplugin`.
+* **forgeplugin.chunkcleanup**: Required to use the `/chunkcleanup` command.
+* **forgeplugin.ispersistent**: Required to use the `/ispersistent` command.
 
 
 Bukkit Plugin Features

@@ -50,10 +50,8 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${dir.artifacts}</outputDirectory>
-							<outputFile>${dir.artifacts}/mod_${project.artifactId}.jar</outputFile>
 							<minimizeJar>false</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
+							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<artifactSet>
 								<includes>
 									<include>Tekkit:Redpower</include>
