@@ -14,7 +14,7 @@
 	<name>ForgePluginRailcraft</name>
 
 	<build>
-		<finalName>${project.name}</finalName>
+		<finalName>${name.mod}</finalName>
 		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
 		<resources>

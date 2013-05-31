@@ -73,6 +73,9 @@
 		<assembly.all.individual>${project.basedir}/../Assembly/assembly/all-individual.xml</assembly.all.individual>
 		<assembly.all.packaged>${project.basedir}/../Assembly/assembly/all-packaged.xml</assembly.all.packaged>
 
+		<name.plugin>${project.name}</name.plugin>
+		<name.mod>mod_${project.name}</name.mod>
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
@@ -164,22 +167,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.4</version>
-					<configuration>
-						<descriptors>
-							<descriptor>${assembly.all.individual}</descriptor>
-							<descriptor>${assembly.all.packaged}</descriptor>
-						</descriptors>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 </project>

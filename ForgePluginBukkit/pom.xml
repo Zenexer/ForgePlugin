@@ -13,7 +13,7 @@
 	<name>ForgePluginBukkit</name>
 
 	<build>
-		<finalName>${project.name}</finalName>
+		<finalName>${name.plugin}</finalName>
 		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
 		<resources>

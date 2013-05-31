@@ -2,9 +2,7 @@ package com.earth2me.minecraft.forgeplugin.events;
 
 import com.earth2me.minecraft.forgeplugin.ForgePlugin;
 import com.earth2me.minecraft.forgeplugin.ItemData;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,7 +28,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public final class ItemMonitor implements IEventHandler
 {
-	private final static String[] lists = new String[]
+	private final static String[] listNodes = new String[]
 	{
 		"all",
 		"use",
@@ -45,6 +43,7 @@ public final class ItemMonitor implements IEventHandler
 	private transient Set<ItemData> bannedUse = new HashSet<>();
 	private transient Set<ItemData> bannedCraft = new HashSet<>();
 	private transient Set<ItemData> bannedBuild = new HashSet<>();
+	private final transient Map<String, Set<ItemData>> lists = new HashMap<>();
 
 	public ItemMonitor(final ForgePlugin plugin)
 	{
@@ -59,15 +58,25 @@ public final class ItemMonitor implements IEventHandler
 	@Override
 	public void onReload()
 	{
-		for (final String list : lists)
+		final BukkitScheduler scheduler = plugin.getServer().getScheduler();
+		final FileConfiguration config = plugin.getConfig();
+
+		if (inventoryScanTask >= 0 && scheduler.isCurrentlyRunning(inventoryScanTask))
 		{
-			final String path = "banned-items/" + list;
+			scheduler.cancelTask(inventoryScanTask);
+		}
+
+		lists.clear();
+		boolean isEmpty = true;
+		for (final String listNode : listNodes)
+		{
+			final String path = "banned-items/" + listNode;
 
 			try
 			{
 				final Set<ItemData> itemSet = getItemSet(path);
 
-				switch (list)
+				switch (listNode)
 				{
 				case "all":
 					bannedAll = itemSet;
@@ -84,6 +93,16 @@ public final class ItemMonitor implements IEventHandler
 				case "build":
 					bannedBuild = itemSet;
 					break;
+
+				default:
+					continue;
+				}
+
+				if (itemSet != null && !itemSet.isEmpty())
+				{
+					lists.put(listNode, itemSet);
+
+					isEmpty = false;
 				}
 			}
 			catch (final Throwable ex)
@@ -92,40 +111,40 @@ public final class ItemMonitor implements IEventHandler
 			}
 		}
 
-		final FileConfiguration config = plugin.getConfig();
-		inventoryScanInterval = config.getInt("settings/inventory-scan-interval", DEFAULT_INVENTORY_SCAN_INTERVAL);
-
-		final BukkitScheduler scheduler = plugin.getServer().getScheduler();
-		if (inventoryScanTask >= 0 && scheduler.isCurrentlyRunning(inventoryScanTask))
+		if (isEmpty)
 		{
-			scheduler.cancelTask(inventoryScanTask);
-		}
-
-		if (inventoryScanInterval > 0)
-		{
-			inventoryScanTask = scheduler.scheduleSyncRepeatingTask(plugin, new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					for (final Player player : plugin.getServer().getOnlinePlayers())
-					{
-						if (isBannedAll(new ItemData(player.getItemInHand())))
-						{
-							player.setItemInHand(null);
-						}
-					}
-				}
-			}, inventoryScanInterval, inventoryScanInterval);
-
-			if (inventoryScanTask >= 0)
-			{
-				plugin.getLogger().log(Level.INFO, String.format("Scanning held items every %d ticks.", inventoryScanInterval));
-			}
+			plugin.getLogger().log(Level.WARNING, String.format("No banned items were found."));
+			inventoryScanInterval = -1;
 		}
 		else
 		{
-			plugin.getLogger().log(Level.INFO, "Not scanning held items at a set interval.");
+			inventoryScanInterval = config.getInt("settings/inventory-scan-interval", DEFAULT_INVENTORY_SCAN_INTERVAL);
+			if (inventoryScanInterval > 0)
+			{
+				inventoryScanTask = scheduler.scheduleSyncRepeatingTask(plugin, new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						for (final Player player : plugin.getServer().getOnlinePlayers())
+						{
+							if (isBannedAll(new ItemData(player.getItemInHand())))
+							{
+								player.setItemInHand(null);
+							}
+						}
+					}
+				}, inventoryScanInterval, inventoryScanInterval);
+
+				if (inventoryScanTask >= 0)
+				{
+					plugin.getLogger().log(Level.INFO, String.format("Scanning held items every %d ticks.", inventoryScanInterval));
+				}
+			}
+			else
+			{
+				plugin.getLogger().log(Level.INFO, "Scanning held items disabled, as a non-positive interval was set.");
+			}
 		}
 	}
 

@@ -21,7 +21,7 @@
         </excludes>
       </resource>
     </resources>
-    <finalName>${project.name}</finalName>
+    <finalName>${name.mod}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
