@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/assembly" type="java-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="ForgePluginBukkit" />
+    <orderEntry type="module" module-name="ForgePluginEquivalentExchange" />
+    <orderEntry type="module" module-name="ForgePluginRailcraft" />
+    <orderEntry type="module" module-name="ForgePluginRedpower" />
+    <orderEntry type="module" module-name="ForgePluginTubeStuff" />
+    <orderEntry type="library" name="Maven: net.milkbowl.vault:Vault:1.2.30" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.14.8" level="project" />
+    <orderEntry type="library" name="Maven: technic-pack:tekkit:1.2.5" level="project" />
+    <orderEntry type="library" name="Maven: Tekkit:Railcraft:5.3.3" level="project" />
+    <orderEntry type="library" name="Maven: Tekkit:EE2Server:1.4.6.5" level="project" />
+    <orderEntry type="library" name="Maven: Tekkit:buildcraft:2.2.14" level="project" />
+    <orderEntry type="library" name="Maven: Tekkit:Redpower:2.0p5b2" level="project" />
+    <orderEntry type="library" name="Maven: Tekkit:tubestuff:49.1.2" level="project" />
+    <orderEntry type="library" name="Maven: Tekkit:immibis-core:49.1.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
+  </component>
+</module>
