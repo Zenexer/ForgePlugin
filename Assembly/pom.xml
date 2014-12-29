@@ -50,34 +50,20 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.5.3</version>
 				<executions>
 					<execution>
-						<id>all-individual</id>
+						<id>bin</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${dir.artifacts.individual}</outputDirectory>
+							<outputDirectory>${dir.artifacts}</outputDirectory>
 							<finalName>ForgePlugin</finalName>
 							<attach>false</attach>
 							<descriptors>
-								<descriptor>${assembly.all.individual}</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-					<execution>
-						<id>all-packaged</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${dir.artifacts.packaged}</outputDirectory>
-							<finalName>ForgePlugin-${project.version}</finalName>
-							<descriptors>
-								<descriptor>${assembly.all.packaged}</descriptor>
+								<descriptor>${project.basedir}/assembly/bin.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

@@ -67,11 +67,7 @@
 
 	<properties>
 		<dir.base>${project.basedir}/..</dir.base>
-		<dir.artifacts.individual>${project.basedir}/../artifacts/individual</dir.artifacts.individual>
-		<dir.artifacts.packaged>${project.basedir}/../artifacts/packaged</dir.artifacts.packaged>
-
-		<assembly.all.individual>${project.basedir}/../Assembly/assembly/all-individual.xml</assembly.all.individual>
-		<assembly.all.packaged>${project.basedir}/../Assembly/assembly/all-packaged.xml</assembly.all.packaged>
+		<dir.artifacts>${project.basedir}/../artifacts</dir.artifacts>
 
 		<name.plugin>${project.name}</name.plugin>
 		<name.mod>mod_${project.name}</name.mod>
